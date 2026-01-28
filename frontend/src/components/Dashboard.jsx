@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Loader from './Loader';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import toast from 'react-hot-toast';
+import EmptyState from './EmptyState';
 
 const statsCards = [
     { title: 'Total Employees', value: '0', icon: Users, color: 'indigo', id: 'total' },
@@ -174,13 +175,13 @@ const Dashboard = () => {
                     }
 
                     return (
-                        <div key={card.title} className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center transition-all hover:shadow-md hover:translate-y-[-2px]">
+                        <div key={card.title} className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center transition-all hover:shadow-md hover:-translate-y-1">
                             <div className={`p-4 rounded-xl mr-4 ${bgClass}`}>
                                 <Icon className={`h-6 w-6 ${textClass}`} />
                             </div>
-                            <div>
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{card.title}</p>
-                                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{value}</p>
+                            <div className="min-w-0">
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">{card.title}</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5 truncate">{value}</p>
                             </div>
                         </div>
                     );
@@ -193,20 +194,28 @@ const Dashboard = () => {
                 <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Attendance Trends (Last 7 Days)</h3>
                     <div className="h-72 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={trendData}>
-                                <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                                <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    cursor={{ fill: 'transparent' }}
-                                />
-                                <Legend />
-                                <Bar dataKey="Present" fill="#10b981" radius={[4, 4, 0, 0]} barSize={20} />
-                                <Bar dataKey="Absent" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={20} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                        {trendData.length > 0 && trendData.some(d => d.Present > 0 || d.Absent > 0) ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={trendData}>
+                                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                                    <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        cursor={{ fill: 'transparent' }}
+                                    />
+                                    <Legend />
+                                    <Bar dataKey="Present" fill="#10b981" radius={[4, 4, 0, 0]} barSize={20} />
+                                    <Bar dataKey="Absent" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={20} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <EmptyState
+                                title="No attendance trends"
+                                description="Trends will appear here once you start marking attendance."
+                                icon={TrendingUp}
+                            />
+                        )}
                     </div>
                 </div>
 
@@ -214,26 +223,34 @@ const Dashboard = () => {
                 <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Department Distribution</h3>
                     <div className="h-72 w-full flex items-center justify-center">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={departmentData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {departmentData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip contentStyle={{ borderRadius: '8px' }} />
-                                <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ fontSize: '12px' }} />
-                            </PieChart>
-                        </ResponsiveContainer>
+                        {departmentData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={departmentData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {departmentData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip contentStyle={{ borderRadius: '8px' }} />
+                                    <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ fontSize: '12px' }} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <EmptyState
+                                title="No department data"
+                                description="Add employees to see the department distribution."
+                                icon={Briefcase}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
@@ -251,11 +268,12 @@ const Dashboard = () => {
 
                     <div className="flow-root">
                         {unmarkedEmployees.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500 dark:text-gray-400">
-                                <CheckCircle className="h-12 w-12 text-green-500 mb-2 opacity-50" />
-                                <p>All caught up!</p>
-                                <p className="text-sm">Everyone has marked attendance today.</p>
-                            </div>
+                            <EmptyState
+                                title="All caught up!"
+                                description="Everyone has marked attendance today. Great job!"
+                                icon={CheckCircle}
+                                actionLabel={null}
+                            />
                         ) : (
                             <ul className="-my-5 divide-y divide-gray-100 dark:divide-slate-700">
                                 {unmarkedEmployees.map((emp) => (
@@ -311,8 +329,12 @@ const Dashboard = () => {
                     <div className="flow-root">
                         <ul className="-my-5 divide-y divide-gray-100 dark:divide-slate-700">
                             {recentActivity.length === 0 ? (
-                                <li className="py-5 text-center text-gray-500 dark:text-gray-400">
-                                    No recent activity
+                                <li className="py-2">
+                                    <EmptyState
+                                        title="No recent activity"
+                                        description="Attendance logs will appear here once employees check in."
+                                        icon={Clock}
+                                    />
                                 </li>
                             ) : (
                                 recentActivity.map((activity, idx) => (

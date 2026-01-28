@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import Modal from './Modal';
 import EmployeeForm from './EmployeeForm';
 import Loader from './Loader';
+import EmptyState from './EmptyState';
 
 const EmployeeList = () => {
     const [employees, setEmployees] = useState([]);
@@ -137,40 +138,40 @@ const EmployeeList = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center transition-all hover:shadow-md hover:-translate-y-1">
                     <div className="p-3 rounded-xl mr-4 bg-indigo-50 dark:bg-indigo-900/20">
                         <Users className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                     </div>
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Employees</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Employees</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white truncate">{stats.total}</p>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center transition-all hover:shadow-md hover:-translate-y-1">
                     <div className="p-3 rounded-xl mr-4 bg-green-50 dark:bg-green-900/20">
                         <UserCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
                     </div>
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Present Today</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.present}</p>
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Present Today</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white truncate">{stats.present}</p>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center transition-all hover:shadow-md hover:-translate-y-1">
                     <div className="p-3 rounded-xl mr-4 bg-red-50 dark:bg-red-900/20">
                         <UserX className="h-6 w-6 text-red-600 dark:text-red-400" />
                     </div>
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Absent Today</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.absent}</p>
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Absent Today</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white truncate">{stats.absent}</p>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center transition-all hover:shadow-md hover:-translate-y-1">
                     <div className="p-3 rounded-xl mr-4 bg-blue-50 dark:bg-blue-900/20">
                         <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div>
-                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Attendance Rate</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.rate}</p>
+                    <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Attendance Rate</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white truncate">{stats.rate}</p>
                     </div>
                 </div>
             </div>
@@ -207,13 +208,12 @@ const EmployeeList = () => {
             </div>
 
             {filteredEmployees.length === 0 ? (
-                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-12 text-center">
-                    <div className="mx-auto h-12 w-12 text-gray-400 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
-                        <UserX className="h-6 w-6" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">No employees found</h3>
-                    <p className="mt-2 text-gray-500 dark:text-gray-400">Try adjusting your search or add a new employee.</p>
-                </div>
+                <EmptyState
+                    title="No employees found"
+                    description={searchTerm || departmentFilter ? "Try adjusting your search or filters to find what you're looking for." : "Get started by adding your first employee to the system."}
+                    actionLabel={!(searchTerm || departmentFilter) ? "Add Employee" : null}
+                    onAction={() => window.location.href = '/add'}
+                />
             ) : (
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
                     <div className="overflow-x-auto">
@@ -268,7 +268,7 @@ const EmployeeList = () => {
                                                 {emp.department}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{emp.email}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 max-w-[200px] truncate" title={emp.email}>{emp.email}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                             <Link
                                                 to={`/employees/${emp.id}`}

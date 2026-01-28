@@ -3,6 +3,7 @@ import { getEmployees, markAttendance } from '../api';
 import Loader from './Loader';
 import { Calendar, CheckCircle, XCircle, Users, User, Check, X, Search, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
+import EmptyState from './EmptyState';
 
 const Attendance = () => {
     const [employees, setEmployees] = useState([]);
@@ -136,32 +137,32 @@ const Attendance = () => {
 
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setFilter('present')}>
-                    <div className="flex items-center">
-                        <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg mr-3">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-all hover:shadow-md hover:-translate-y-1" onClick={() => setFilter('present')}>
+                    <div className="flex items-center min-w-0">
+                        <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg mr-3 flex-shrink-0">
                             <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                         </div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Present</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Present</span>
                     </div>
-                    <span className="text-2xl font-bold text-gray-900 dark:text-white">{stats.present}</span>
+                    <span className="text-2xl font-bold text-gray-900 dark:text-white ml-4">{stats.present}</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setFilter('absent')}>
-                    <div className="flex items-center">
-                        <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg mr-3">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-all hover:shadow-md hover:-translate-y-1" onClick={() => setFilter('absent')}>
+                    <div className="flex items-center min-w-0">
+                        <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg mr-3 flex-shrink-0">
                             <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
                         </div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Absent</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Absent</span>
                     </div>
-                    <span className="text-2xl font-bold text-gray-900 dark:text-white">{stats.absent}</span>
+                    <span className="text-2xl font-bold text-gray-900 dark:text-white ml-4">{stats.absent}</span>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" onClick={() => setFilter('unmarked')}>
-                    <div className="flex items-center">
-                        <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg mr-3">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-all hover:shadow-md hover:-translate-y-1" onClick={() => setFilter('unmarked')}>
+                    <div className="flex items-center min-w-0">
+                        <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg mr-3 flex-shrink-0">
                             <Users className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                         </div>
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Unmarked</span>
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">Unmarked</span>
                     </div>
-                    <span className="text-2xl font-bold text-gray-900 dark:text-white">{stats.unmarked}</span>
+                    <span className="text-2xl font-bold text-gray-900 dark:text-white ml-4">{stats.unmarked}</span>
                 </div>
             </div>
 
@@ -271,9 +272,12 @@ const Attendance = () => {
                     </table>
                 </div>
                 {filteredEmployees.length === 0 && (
-                    <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                        No employees found matching your filter.
-                    </div>
+                    <EmptyState
+                        title="No records found"
+                        description="Try adjusting your filters or date to see more records."
+                        actionLabel="Clear Filters"
+                        onAction={() => setFilter('all')}
+                    />
                 )}
             </div>
         </div>
