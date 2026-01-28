@@ -27,7 +27,8 @@ const Dashboard = () => {
     const fetchData = async () => {
         try {
             const response = await getEmployees();
-            const employees = response.data;
+            const employees = Array.isArray(response.data) ? response.data : [];
+            if (!Array.isArray(response.data)) console.error("API Error: Expected array but got", response.data);
             const today = new Date().toISOString().split('T')[0];
 
             let presentCount = 0;

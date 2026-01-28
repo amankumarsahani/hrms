@@ -20,7 +20,8 @@ const EmployeeList = () => {
     const fetchEmployees = async () => {
         try {
             const response = await getEmployees();
-            const data = response.data;
+            const data = Array.isArray(response.data) ? response.data : [];
+            if (!Array.isArray(response.data)) console.error("API Error: Expected array but got", response.data);
             setEmployees(data);
             setFilteredEmployees(data);
 

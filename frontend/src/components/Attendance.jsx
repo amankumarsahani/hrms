@@ -15,7 +15,9 @@ const Attendance = () => {
     const fetchEmployees = async () => {
         try {
             const response = await getEmployees();
-            setEmployees(response.data);
+            const data = Array.isArray(response.data) ? response.data : [];
+            if (!Array.isArray(response.data)) console.error("API Error: Expected array but got", response.data);
+            setEmployees(data);
             setLoading(false);
         } catch (error) {
             toast.error("Failed to load employees");
