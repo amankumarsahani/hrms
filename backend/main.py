@@ -12,7 +12,8 @@ app = FastAPI(title="HRMS Lite API", version="1.0.0")
 origins = [
     "http://localhost:5173", # Vite dev server
     "http://127.0.0.1:5173",
-    "*", # Allow all for now, strictly for dev simplicity or modify as needed
+    "https://hrms-lite.netlify.app", # Example Netlify URL
+    "*", # Allow all (for simplicity in this demo)
 ]
 
 app.add_middleware(
