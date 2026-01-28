@@ -27,29 +27,6 @@ const EmployeeList = () => {
             setEmployees(data);
             setFilteredEmployees(data);
 
-            // Stats Calculation
-            const today = new Date().toISOString().split('T')[0];
-            let presentCount = 0;
-            let absentCount = 0;
-
-            data.forEach(emp => {
-                const todayRecord = emp.attendance_records?.find(r => r.date === today);
-                if (todayRecord) {
-                    if (todayRecord.status === 'Present') presentCount++;
-                    if (todayRecord.status === 'Absent') absentCount++;
-                }
-            });
-
-            const total = data.length;
-            const rate = total > 0 ? Math.round((presentCount / total) * 100) : 0;
-
-            setStats({
-                total,
-                present: presentCount,
-                absent: absentCount,
-                rate: `${rate}%`
-            });
-
             setLoading(false);
         } catch (err) {
             toast.error('Failed to fetch employees');
@@ -60,6 +37,30 @@ const EmployeeList = () => {
     useEffect(() => {
         fetchEmployees();
     }, []);
+
+    useEffect(() => {
+        const today = new Date().toISOString().split('T')[0];
+        let presentCount = 0;
+        let absentCount = 0;
+
+        employees.forEach(emp => {
+            const todayRecord = emp.attendance_records?.find(r => r.date === today);
+            if (todayRecord) {
+                if (todayRecord.status === 'Present') presentCount++;
+                if (todayRecord.status === 'Absent') absentCount++;
+            }
+        });
+
+        const total = employees.length;
+        const rate = total > 0 ? Math.round((presentCount / total) * 100) : 0;
+
+        setStats({
+            total,
+            present: presentCount,
+            absent: absentCount,
+            rate: `${rate}%`
+        });
+    }, [employees]);
 
     useEffect(() => {
         let results = employees.filter(emp =>
