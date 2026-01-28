@@ -4,8 +4,8 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
 # Get DATABASE_URL from environment variable (Railway provides this)
-# If not found, fallback to local SQLite for development
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./hrms.db")
+# Railway often names it MYSQL_URL for MySQL services
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL") or os.getenv("MYSQL_URL") or "sqlite:///./hrms.db"
 
 # Handle "mysql://" to "mysql+pymysql://" fix for SQLAlchemy if needed
 if SQLALCHEMY_DATABASE_URL.startswith("mysql://"):
