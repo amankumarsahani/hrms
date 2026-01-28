@@ -56,5 +56,18 @@ def mark_attendance(db: Session, attendance: schemas.AttendanceCreate, employee_
     )
     db.add(db_attendance)
     db.commit()
+    db.add(db_attendance)
+    db.commit()
     db.refresh(db_attendance)
     return db_attendance
+
+def update_employee(db: Session, employee_id: int, employee_data: schemas.EmployeeCreate):
+    db_employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
+    if db_employee:
+        db_employee.name = employee_data.name
+        db_employee.email = employee_data.email
+        db_employee.department = employee_data.department
+        db_employee.employee_id = employee_data.employee_id
+        db.commit()
+        db.refresh(db_employee)
+    return db_employee

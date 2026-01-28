@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getEmployees, deleteEmployee } from '../api';
-import { Trash2, Eye, Plus, Search, UserX, ArrowUpDown, Filter, Users, User, UserCheck, TrendingUp, Clock } from 'lucide-react';
+import { Trash2, Eye, Plus, Search, UserX, ArrowUpDown, Filter, Users, User, UserCheck, TrendingUp, Clock, Edit } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Modal from './Modal';
+import EmployeeForm from './EmployeeForm';
 import Loader from './Loader';
 
 const EmployeeList = () => {
@@ -14,6 +15,7 @@ const EmployeeList = () => {
     const [departmentFilter, setDepartmentFilter] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [stats, setStats] = useState({ total: 0, present: 0, absent: 0, rate: '0%' });
 
@@ -93,6 +95,11 @@ const EmployeeList = () => {
     const confirmDelete = (employee) => {
         setSelectedEmployee(employee);
         setDeleteModalOpen(true);
+    };
+
+    const openEditModal = (employee) => {
+        setSelectedEmployee(employee);
+        setEditModalOpen(true);
     };
 
     const handleDelete = async () => {
@@ -270,6 +277,13 @@ const EmployeeList = () => {
                                                 <Eye size={18} />
                                             </Link>
                                             <button
+                                                onClick={() => openEditModal(emp)}
+                                                className="inline-flex items-center p-1.5 border border-transparent rounded-full text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                                                title="Edit Employee"
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button
                                                 onClick={() => confirmDelete(emp)}
                                                 className="inline-flex items-center p-1.5 border border-transparent rounded-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                                                 title="Delete Employee"
@@ -311,6 +325,24 @@ const EmployeeList = () => {
                             Delete
                         </button>
                     </div>
+                </div>
+            </Modal>
+
+            {/* Edit Employee Modal */}
+            <Modal
+                isOpen={editModalOpen}
+                onClose={() => setEditModalOpen(false)}
+                title="Edit Employee"
+            >
+                <div className="mt-2 text-left">
+                    <EmployeeForm
+                        initialData={selectedEmployee}
+                        onSuccess={() => {
+                            setEditModalOpen(false);
+                            fetchEmployees();
+                        }}
+                        onClose={() => setEditModalOpen(false)}
+                    />
                 </div>
             </Modal>
         </div>

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createEmployee } from '../api';
+import { useNavigate, useParams } from 'react-router-dom';
+import { createEmployee, getEmployee, updateEmployee } from '../api';
 import toast from 'react-hot-toast';
 import { ArrowLeft, User, Mail, Briefcase, Hash } from 'lucide-react';
 
-const EmployeeForm = () => {
+const EmployeeForm = ({ initialData, onSuccess, onClose }) => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditMode = Boolean(id) || Boolean(initialData);
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -14,6 +17,30 @@ const EmployeeForm = () => {
     });
     const [loading, setLoading] = useState(false);
 
+    // Fetch existing data if in edit mode
+    React.useEffect(() => {
+        if (initialData) {
+            setFormData({
+                name: initialData.name || '',
+                email: initialData.email || '',
+                department: initialData.department || '',
+                employee_id: initialData.employee_id || ''
+            });
+        } else if (isEditMode && id) {
+            const fetchEmployee = async () => {
+                try {
+                    const response = await getEmployee(id);
+                    const { name, email, department, employee_id } = response.data;
+                    setFormData({ name, email, department, employee_id });
+                } catch (error) {
+                    toast.error("Failed to fetch employee details");
+                    navigate('/employees');
+                }
+            };
+            fetchEmployee();
+        }
+    }, [id, isEditMode, navigate, initialData]);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -21,10 +48,21 @@ const EmployeeForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setLoading(true);
         try {
-            await createEmployee(formData);
-            toast.success('Employee added successfully');
-            navigate('/employees');
+            if (isEditMode) {
+                const empId = initialData ? initialData.id : id;
+                await updateEmployee(empId, formData);
+                toast.success('Employee updated successfully');
+            } else {
+                await createEmployee(formData);
+                toast.success('Employee added successfully');
+            }
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                navigate('/employees');
+            }
         } catch (err) {
             toast.error(err.response?.data?.detail || 'Failed to create employee');
         } finally {
@@ -34,21 +72,25 @@ const EmployeeForm = () => {
 
     return (
         <div className="max-w-2xl mx-auto space-y-6 animate-fadeIn">
-            <button
-                onClick={() => navigate(-1)}
-                className="flex items-center text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-            >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Back
-            </button>
+            {!onClose && (
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
+                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    Back
+                </button>
+            )}
 
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
-                <div className="px-8 py-6 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Add New Employee</h2>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter the details of the new team member.</p>
-                </div>
+            <div className={`${onClose ? '' : 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden'}`}>
+                {!onClose && (
+                    <div className="px-8 py-6 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{isEditMode ? 'Edit Employee' : 'Add New Employee'}</h2>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{isEditMode ? 'Update the details of the team member.' : 'Enter the details of the new team member.'}</p>
+                    </div>
+                )}
 
-                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                <form onSubmit={handleSubmit} className={onClose ? "space-y-6" : "p-8 space-y-6"}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -64,6 +106,7 @@ const EmployeeForm = () => {
                                     required
                                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 transition-colors"
                                     placeholder="John Doe"
+                                    value={formData.name}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -83,6 +126,7 @@ const EmployeeForm = () => {
                                     required
                                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 transition-colors"
                                     placeholder="EMP001"
+                                    value={formData.employee_id}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -102,6 +146,7 @@ const EmployeeForm = () => {
                                     required
                                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 transition-colors"
                                     placeholder="john@example.com"
+                                    value={formData.email}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -120,7 +165,7 @@ const EmployeeForm = () => {
                                     required
                                     className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white transition-colors"
                                     onChange={handleChange}
-                                    defaultValue=""
+                                    value={formData.department}
                                 >
                                     <option value="" disabled>Select Department</option>
                                     <option value="HR">HR</option>
@@ -139,7 +184,7 @@ const EmployeeForm = () => {
                             disabled={loading}
                             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
                         >
-                            {loading ? 'Creating...' : 'Create Employee'}
+                            {loading ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Employee' : 'Create Employee')}
                         </button>
                     </div>
                 </form>

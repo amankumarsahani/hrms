@@ -16,6 +16,7 @@ function App() {
         <Route path="/employees" element={<EmployeeList />} />
         <Route path="/add" element={<EmployeeForm />} />
         <Route path="/employees/:id" element={<EmployeeDetails />} />
+        <Route path="/edit/:id" element={<EmployeeForm />} />
         <Route path="/attendance" element={<Attendance />} />
       </Routes>
     </Layout>
