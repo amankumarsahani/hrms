@@ -12,10 +12,10 @@ class Employee(Base):
     __tablename__ = "employees"
 
     id = Column(Integer, primary_key=True, index=True)
-    employee_id = Column(String, unique=True, index=True, nullable=False)
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
-    department = Column(String, nullable=False)
+    employee_id = Column(String(50), unique=True, index=True, nullable=False)
+    name = Column(String(100), nullable=False)
+    email = Column(String(100), unique=True, index=True, nullable=False)
+    department = Column(String(50), nullable=False)
     
     attendance_records = relationship("Attendance", back_populates="employee", cascade="all, delete-orphan")
 
